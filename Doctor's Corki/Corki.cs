@@ -239,7 +239,7 @@ namespace Borki7
                     }
                 }
 				
-                if (useE && E.IsReady() && _Player.Position.CountEnemyChampionsInRange(E.Range))
+                if (useE && E.IsReady() && _Player.Position.CountEnemyChampionsInRange(E.Range) >= 1)
                 {
                     E.Cast();
                 }
@@ -282,7 +282,7 @@ namespace Borki7
                     }
                 }
 				
-                if (useE && E.IsReady() && _Player.Position.CountEnemyChampionsInRange(E.Range))
+                if (useE && E.IsReady() && _Player.Position.CountEnemyChampionsInRange(E.Range) >= 1)
                 {
                     E.Cast();
                 }
