@@ -40,30 +40,31 @@ namespace Kayle
         {
             if (!_Player.ChampionName.Contains("Kayle")) return;
             Chat.Print("Doctor's Kayle Loaded!", Color.Orange);
+            Chat.Print("Mercedes7", Color.Red);
             Q = new Spell.Targeted(SpellSlot.Q, 650);
             W = new Spell.Targeted(SpellSlot.W, 900);
             E = new Spell.Active(SpellSlot.E, (uint)Player.Instance.GetAutoAttackRange());
             R = new Spell.Targeted(SpellSlot.R, 900);
             Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             thm = new Font(Drawing.Direct3DDevice, new FontDescription { FaceName = "Tahoma", Height = 22, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.ClearType });
-            Menu = MainMenu.AddMenu("Kayle", "Kayle");
-            Menu.AddGroupLabel("Doctor7");
+            Menu = MainMenu.AddMenu("Doctor's Kayle", "Kayle");
+            Menu.AddGroupLabel("Mercedes7");
             ComboMenu = Menu.AddSubMenu("Combo Settings", "Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("ComboQ", new CheckBox("Use [Q] Combo"));
             ComboMenu.Add("ComboE", new CheckBox("Use [E] Combo"));
 
-            Ulti = Menu.AddSubMenu("Ultimate Settings", "Ulti");
+            Ulti = Menu.AddSubMenu("R Settings", "Ulti");
             Ulti.AddGroupLabel("Ultimate Settings");
             Ulti.Add("ultiR2", new CheckBox("Use [R]"));
-            Ulti.Add("Alhp", new Slider("HP Use [R]", 25));
+            Ulti.Add("Alhp", new Slider("HP Use [R]", 30));
             Ulti.AddGroupLabel("Use [R] On");
             foreach (var target in EntityManager.Heroes.Allies)
             {
                 Ulti.Add("useRon" + target.ChampionName, new CheckBox("" + target.ChampionName));
             }
 
-            Heal = Menu.AddSubMenu("Heal Settings", "Heal");
+            Heal = Menu.AddSubMenu("W Settings", "Heal");
             Heal.AddGroupLabel("Heal Settings");
             Heal.Add("healW2", new CheckBox("Use [W] Allies"));
             Heal.Add("ManaHeal", new Slider("Mana Use Heal", 20));
@@ -84,6 +85,7 @@ namespace Kayle
             LaneClearMenu.AddGroupLabel("Lane Clear Settings");
             LaneClearMenu.Add("QLC", new CheckBox("Use [Q] LaneClear", false));
             LaneClearMenu.Add("ELC", new CheckBox("Use [E] LaneClear"));
+            LaneClearMenu.Add("mine", new Slider("Min minions around use [E]", 3, 1, 6));
             LaneClearMenu.Add("ManaLC", new Slider("Mana For LaneClear", 50));
             LaneClearMenu.AddGroupLabel("Lasthit Settings");
             LaneClearMenu.Add("QLH", new CheckBox("Use [Q] Lasthit"));
@@ -250,12 +252,13 @@ namespace Kayle
         {
             var useQ = LaneClearMenu["QLC"].Cast<CheckBox>().CurrentValue;
             var useE = LaneClearMenu["ELC"].Cast<CheckBox>().CurrentValue;
+            var minE = LaneClearMenu["mine"].Cast<Slider>().CurrentValue;
             var mana = LaneClearMenu["ManaLC"].Cast<Slider>().CurrentValue;
             var minion = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(a => a.Distance(Player.Instance) <= Q.Range).OrderBy(a => a.Health).FirstOrDefault();
             if (Player.Instance.ManaPercent < mana) return;
             if (minion != null)
             {
-                if (useE && E.IsReady() && minion.IsValidTarget(550) && _Player.Position.CountEnemyMinionsInRange(550) >= 3)
+                if (useE && E.IsReady() && minion.IsValidTarget(550) && _Player.Position.CountEnemyMinionsInRange(550) >= minE)
                 {
                     E.Cast();
                 }
