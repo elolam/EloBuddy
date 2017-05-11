@@ -42,6 +42,7 @@ namespace Borki7
         {
             if (!_Player.ChampionName.Contains("Corki")) return;
             Chat.Print("Doctor's Corki Loaded!", Color.Orange);
+            Chat.Print("Mercedes7!", Color.Red);
             Q = new Spell.Skillshot(SpellSlot.Q, 825, SkillShotType.Circular, 300 , 1000 ,250);
             Q.AllowedCollisionCount = int.MaxValue;
             W = new Spell.Skillshot(SpellSlot.W, 800, SkillShotType.Linear);
@@ -58,7 +59,7 @@ namespace Borki7
             SpellMenu.Add("ComboQ", new CheckBox("Use [Q] Combo"));
             SpellMenu.Add("QMode", new ComboBox("Q Mode:", 0, "Fast [Q]", "[Q] After Attack"));
             SpellMenu.Add("ComboR", new CheckBox("Use [R] Combo"));
-            SpellMenu.Add("RMode", new ComboBox("Q Mode:", 0, "Fast [R]", "[R] After Attack"));
+            SpellMenu.Add("RMode", new ComboBox("R Mode:", 0, "Fast [R]", "[R] After Attack"));
             SpellMenu.Add("ComboE", new CheckBox("Use [E] Combo"));
 
             HarassMenu = Menu.AddSubMenu("Harass Settings", "Harass");
@@ -72,7 +73,9 @@ namespace Borki7
             ClearMenu = Menu.AddSubMenu("LaneClear Settings", "LaneClear");
             ClearMenu.AddGroupLabel("Laneclear Settings");
             ClearMenu.Add("ClearQ", new CheckBox("Use [Q] LaneClear", false));
+            ClearMenu.Add("minq", new Slider("Min hit minions use [Q]", 3, 1, 6));
             ClearMenu.Add("ClearR", new CheckBox("Use [R] LaneClear", false));
+            ClearMenu.Add("minr", new Slider("Min hit minions use [R]", 2, 1, 6));
             ClearMenu.Add("ClearE", new CheckBox("Use [E] LaneClear", false));
             ClearMenu.Add("manaClear", new Slider("Min Mana LaneClear", 65, 0, 100));
             ClearMenu.Add("RocketClear", new Slider("Save Rockets [R]", 3, 0, 6));
@@ -236,7 +239,7 @@ namespace Borki7
                     }
                 }
 				
-                if (useE && E.IsReady() && target.IsValidTarget(E.Range))
+                if (useE && E.IsReady() && _Player.Position.CountEnemyChampionsInRange(E.Range))
                 {
                     E.Cast();
                 }
@@ -279,7 +282,7 @@ namespace Borki7
                     }
                 }
 				
-                if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !Orbwalker.IsAutoAttacking)
+                if (useE && E.IsReady() && _Player.Position.CountEnemyChampionsInRange(E.Range))
                 {
                     E.Cast();
                 }
@@ -295,27 +298,26 @@ namespace Borki7
             var useR = ClearMenu["ClearR"].Cast<CheckBox>().CurrentValue;
             var useE = ClearMenu["ClearE"].Cast<CheckBox>().CurrentValue;
             var Rocket = ClearMenu["RocketClear"].Cast<Slider>().CurrentValue;
-            var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, _Player.Position, R.Range).ToArray();
-            var QCal = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(minions, Q.Width, (int)Q.Range);
-
+            var minR = ClearMenu["minr"].Cast<Slider>().CurrentValue;
+            var minQ = ClearMenu["minq"].Cast<Slider>().CurrentValue;
             if (Player.Instance.ManaPercent < mana)
             {
                 return;
             }
 
-            foreach (var minion in minions)
+            foreach (var minion in EntityManager.MinionsAndMonsters.GetLaneMinions().Where(e => e.IsValidTarget(R.Range)))
             {
-                if (useR && R.IsReady() && minion.IsValidTarget(R.Range) && R.Handle.Ammo > Rocket)
+                if (useR && R.IsReady() && minion.CountEnemyMinionsInRange(180) >= minR && R.Handle.Ammo > Rocket)
                 {
-                    R.Cast(minion.Position);
+                    R.Cast(minion);
                 }
 
-                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && QCal.HitNumber >= 2 && !Orbwalker.IsAutoAttacking)
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.CountEnemyMinionsInRange(300) >= minQ && !Orbwalker.IsAutoAttacking)
                 {
-                    Q.Cast(QCal.CastPosition);
+                    Q.Cast(minion);
                 }
 				
-                if (useE && E.IsReady() && minion.IsValidTarget(E.Range) && !Orbwalker.IsAutoAttacking)
+                if (useE && E.IsReady() && minion.IsValidTarget(E.Range) && _Player.Position.CountEnemyMinionsInRange(600) >= 2 && !Orbwalker.IsAutoAttacking)
                 {
                     E.Cast();
                 }
