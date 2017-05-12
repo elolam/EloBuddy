@@ -41,6 +41,7 @@ namespace Hecarim7
         {
             if (!_Player.ChampionName.Contains("Hecarim")) return;
             Chat.Print("Doctor's Hecarim Loaded!", Color.Orange);
+            Chat.Print("Mercedes7!", Color.Red);
 			Q = new Spell.Active(SpellSlot.Q, 350);
             W = new Spell.Active(SpellSlot.W, 525);
             E = new Spell.Active(SpellSlot.E);

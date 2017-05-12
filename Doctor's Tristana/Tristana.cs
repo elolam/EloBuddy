@@ -38,6 +38,7 @@ namespace Tristana
         {
             if (!_Player.ChampionName.Contains("Tristana")) return;
             Chat.Print("Doctor's Tristana Loaded!", Color.Orange);
+            Chat.Print("Mercedes7!", Color.Red);
             uint level = (uint)Player.Instance.Level;
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 450, int.MaxValue, 180);

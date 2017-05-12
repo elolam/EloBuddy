@@ -37,6 +37,7 @@ namespace Jax
         {
             if (!_Player.ChampionName.Contains("Jax")) return;
             Chat.Print("Doctor's Jax Loaded!", Color.White);
+            Chat.Print("Mercedes7!", Color.Red);
             Q = new Spell.Targeted(SpellSlot.Q, 700);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E,350);

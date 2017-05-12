@@ -41,6 +41,7 @@ namespace Trundle7
         {
             if (!_Player.ChampionName.Contains("Trundle")) return;
             Chat.Print("Doctor's Trundle Loaded!", Color.Orange);
+            Chat.Print("Mercedes7!", Color.Red);
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 0, 2000, 900);
             E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Circular, 500, int.MaxValue, 80);

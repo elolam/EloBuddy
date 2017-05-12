@@ -85,7 +85,7 @@ namespace Kayle
             LaneClearMenu.AddGroupLabel("Lane Clear Settings");
             LaneClearMenu.Add("QLC", new CheckBox("Use [Q] LaneClear", false));
             LaneClearMenu.Add("ELC", new CheckBox("Use [E] LaneClear"));
-            LaneClearMenu.Add("mine", new Slider("Min minions around use [E]", 3, 1, 6));
+            LaneClearMenu.Add("mine", new Slider("Min minions around use [E]", 2, 1, 6));
             LaneClearMenu.Add("ManaLC", new Slider("Mana For LaneClear", 50));
             LaneClearMenu.AddGroupLabel("Lasthit Settings");
             LaneClearMenu.Add("QLH", new CheckBox("Use [Q] Lasthit"));
@@ -258,7 +258,7 @@ namespace Kayle
             if (Player.Instance.ManaPercent < mana) return;
             if (minion != null)
             {
-                if (useE && E.IsReady() && minion.IsValidTarget(550) && _Player.Position.CountEnemyMinionsInRange(550) >= minE)
+                if (useE && E.IsReady() && minion.IsValidTarget(550) && _Player.Position.CountEnemyMinionsInRange(1000) >= minE)
                 {
                     E.Cast();
                 }

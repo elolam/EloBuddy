@@ -41,7 +41,8 @@ namespace Ekko
         private static void OnLoadingComplete(EventArgs args)
         {
             if (!_Player.ChampionName.Contains("Ekko")) return;
-            Chat.Print("Victorious Ekko Loaded!", Color.White);
+            Chat.Print("Doctor's Ekko Loaded!", Color.White);
+            Chat.Print("Mercedes7!", Color.Red);
             EkkoREmitter = ObjectManager.Get<Obj_GeneralParticleEmitter>().FirstOrDefault(x => x.Name.Equals("Ekko_Base_R_TrailEnd.troy"));
             Q = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Linear, 250, 2200, 60);
             Q.AllowedCollisionCount = int.MaxValue;
@@ -50,7 +51,7 @@ namespace Ekko
             E = new Spell.Active(SpellSlot.E, 450);
             R = new Spell.Active(SpellSlot.R, 375);
             Thm = new Font(Drawing.Direct3DDevice, new FontDescription { FaceName = "Tahoma", Height = 16, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.ClearType });
-            Menu = MainMenu.AddMenu("Victorious Ekko", "Ekko");
+            Menu = MainMenu.AddMenu("Doctor's Ekko", "Ekko");
             Menu.AddGroupLabel("Mercedes7");
             ComboMenu = Menu.AddSubMenu("Combo Settings", "Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
