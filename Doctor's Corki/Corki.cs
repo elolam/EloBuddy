@@ -57,9 +57,9 @@ namespace Borki7
             SpellMenu = Menu.AddSubMenu("Combo Settings", "Combo");
             SpellMenu.AddGroupLabel("Combo Settings");
             SpellMenu.Add("ComboQ", new CheckBox("Use [Q] Combo"));
-            SpellMenu.Add("QMode", new ComboBox("Q Mode:", 0, "Fast [Q]", "[Q] After Attack"));
+            SpellMenu.Add("QMode", new ComboBox("Q Mode:", 0, "Normal [Q]", "[Q] After Attack"));
             SpellMenu.Add("ComboR", new CheckBox("Use [R] Combo"));
-            SpellMenu.Add("RMode", new ComboBox("R Mode:", 0, "Fast [R]", "[R] After Attack"));
+            SpellMenu.Add("RMode", new ComboBox("R Mode:", 0, "Normal [R]", "[R] After Attack"));
             SpellMenu.Add("ComboE", new CheckBox("Use [E] Combo"));
 
             HarassMenu = Menu.AddSubMenu("Harass Settings", "Harass");

@@ -58,9 +58,9 @@ namespace Ezreal
             ComboMenu = Menu.AddSubMenu("Combo Settings", "Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("ComboQ", new CheckBox("Use [Q] Combo"));
-            ComboMenu.Add("comboMode", new ComboBox("Q Mode:", 0, "Fast [Q]", "[Q] After AA"));
+            ComboMenu.Add("comboMode", new ComboBox("Q Mode:", 0, "Normal [Q]", "[Q] After AA"));
             ComboMenu.Add("ComboW", new CheckBox("Use [W] Combo"));
-            ComboMenu.Add("WMode", new ComboBox("W Mode:", 0, "Fast [W]", "[W] After AA"));
+            ComboMenu.Add("WMode", new ComboBox("W Mode:", 0, "Normal [W]", "[W] After AA"));
             ComboMenu.AddGroupLabel("Ultimate Settings");
             ComboMenu.Add("ComboR", new CheckBox("Use [R] AoE"));
             ComboMenu.Add("MinR", new Slider("Use [R] AoE if hit x Enemies", 2, 1, 5));
@@ -117,7 +117,7 @@ namespace Ezreal
             Misc.Add("Rstun", new CheckBox("Use [R] Enemies Immobile"));
             Misc.AddGroupLabel("Auto Stacks Settings");
             Misc.Add("Stack", new CheckBox("Auto Stacks In Shop"));
-            Misc.Add("Stackk", new CheckBox("Auto Stacks If Enemies Around = 0", false));
+            Misc.Add("Stackk", new CheckBox("Auto Stacks If No Enemies Around", false));
             Misc.Add("Stackkm", new Slider("Min Mana Auto Stack", 80));
 
             Items = Menu.AddSubMenu("Items Settings", "Items");

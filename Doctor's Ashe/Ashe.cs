@@ -30,7 +30,7 @@ namespace Ashe
         {
             get { return ObjectManager.Player; }
         }
-        public static Menu Menu, ComboMenu, JungleClearMenu, HarassMenu, LaneClearMenu, Misc, Items, Skin;
+        public static Menu Menu, ComboMenu, JungleClearMenu, HarassMenu, LaneClearMenu, Misc, Items;
 
         static void Main(string[] args)
         {
@@ -58,16 +58,17 @@ namespace Ashe
             Menu.AddGroupLabel("Mercedes7");
             ComboMenu = Menu.AddSubMenu("Combo Settings", "Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
-            ComboMenu.Add("ComboQ", new CheckBox("Use [Q] Reset AA"));
+            ComboMenu.Add("ComboQ", new CheckBox("Use [Q] Combo"));
+            ComboMenu.Add("Qmode", new ComboBox("Q Mode:", 0, "Normal [Q]", "[Q] Reload AA"));
             ComboMenu.Add("ComboW", new CheckBox("Use [W] Combo"));
-            ComboMenu.Add("ComboMode", new ComboBox("W Mode:", 1, "Fast [W]", "[W] Reset AA"));
+            ComboMenu.Add("ComboMode", new ComboBox("W Mode:", 0, "Normal [W]", "[W] Reload AA"));
             ComboMenu.Add("ComboR", new CheckBox("Use [R] Combo"));
             ComboMenu.Add("KeepCombo", new CheckBox("Keep Mana For [R]", false));
             ComboMenu.AddGroupLabel("Ultimate Aoe Settings");
             ComboMenu.Add("RAoe", new CheckBox("Use [R] Aoe"));
             ComboMenu.Add("minRAoe", new Slider("Use [R] Aoe If Hit x Enemies", 2, 1, 5));
             ComboMenu.AddGroupLabel("Ultimate Selected Target Settings");
-            ComboMenu.Add("ComboSL", new KeyBind("Use [R] On Selected Target", false, KeyBind.BindTypes.HoldActive, 'Y'));
+            ComboMenu.Add("ComboSL", new CheckBox("Use [R] On Selected Target"));
             ComboMenu.AddGroupLabel("KillSteal Settings");
             ComboMenu.Add("RKs", new CheckBox("Use [R] KillSteal"));
             ComboMenu.Add("WKs", new CheckBox("Use [W] KillSteal"));
@@ -109,10 +110,6 @@ namespace Ashe
             Misc.Add("DrawW", new CheckBox("Draw [W]", false));
             Misc.Add("Notifications", new CheckBox("Alerter Can Kill With [R]"));
 
-            Skin = Menu.AddSubMenu("Skin Changer", "SkinChanger");
-            Skin.Add("checkSkin", new CheckBox("Use Skin Changer", false));
-            Skin.Add("skin.Id", new ComboBox("Skin Mode", 6, "1", "2", "3", "4", "5", "6", "7", "8", "9"));
-
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             Gapcloser.OnGapcloser += Gapcloser_OnGapCloser;
@@ -137,6 +134,7 @@ namespace Ashe
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo();
+                RSelected();
             }
 			
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
@@ -156,15 +154,6 @@ namespace Ashe
 			
             KillSteal();
             Item();
-            RSelected();
-			
-            if (_Player.SkinId != Skin["skin.Id"].Cast<ComboBox>().CurrentValue)
-            {
-                if (checkSkin())
-                {
-                    Player.SetSkinId(SkinId());
-                }
-            }
         }
 
 // Drawings
@@ -205,18 +194,6 @@ namespace Ashe
             {
                 W.Cast(target);
             }
-        }
-
-// Skin Changer
-
-        public static int SkinId()
-        {
-            return Skin["skin.Id"].Cast<ComboBox>().CurrentValue;
-        }
-
-        public static bool checkSkin()
-        {
-            return Skin["checkSkin"].Cast<CheckBox>().CurrentValue;
         }
 
 // Interrupt
@@ -262,12 +239,40 @@ namespace Ashe
 
         private static void Harass()
         {
+            var useQ = HarassMenu["HarassQ"].Cast<CheckBox>().CurrentValue;
             var useW = HarassMenu["HarassW"].Cast<CheckBox>().CurrentValue;
             var Keep = HarassMenu["KeepHarass"].Cast<CheckBox>().CurrentValue;
             var mana = HarassMenu["manaHarass"].Cast<Slider>().CurrentValue;
-            if (_Player.ManaPercent < mana) return;
+
+            if (_Player.ManaPercent < mana)
+            {
+                return;
+            }
+
             foreach (var target in EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(W.Range) && !e.IsDead && !e.IsZombie))
             {
+                if (useQ && QReady && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && target.IsValidTarget(850))
+                {
+                    if (Keep)
+                    {
+                        if (R.IsReady())
+                        {
+                            if (Player.Instance.Mana > Q.Handle.SData.Mana + R.Handle.SData.Mana)
+                            {
+                                Q.Cast();
+                            }
+                        }
+                        else
+                        {
+                            Q.Cast();
+                        }
+                    }
+                    else
+                    {
+                        Q.Cast();
+                    }
+                }
+
                 if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !Orbwalker.IsAutoAttacking)
                 {
                     var WPred = W.GetPrediction(target);
@@ -303,6 +308,7 @@ namespace Ashe
 
         private static void Combo()
         {
+            var useQ = ComboMenu["ComboQ"].Cast<CheckBox>().CurrentValue;
             var useW = ComboMenu["ComboW"].Cast<CheckBox>().CurrentValue;
             var RAoe = ComboMenu["RAoe"].Cast<CheckBox>().CurrentValue;
             var MinR = ComboMenu["minRAoe"].Cast<Slider>().CurrentValue;
@@ -373,6 +379,31 @@ namespace Ashe
                         }
                     }
                 }
+				
+                if (ComboMenu["Qmode"].Cast<ComboBox>().CurrentValue == 0)
+                {
+                    if (useQ && QReady && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && target.IsValidTarget(850))
+                    {
+                        if (Keep)
+                        {
+                            if (R.IsReady())
+                            {
+                                if (Player.Instance.Mana > Q.Handle.SData.Mana + R.Handle.SData.Mana)
+                                {
+                                    Q.Cast();
+                                }
+                            }
+                            else
+                            {
+                                Q.Cast();
+                            }
+                        }
+                        else
+                        {
+                            Q.Cast();
+                        }
+                    }
+                }
 
                 if (useR && R.IsReady() && target.IsValidTarget(W.Range) && _Player.HealthPercent <= 70)
                 {
@@ -397,7 +428,7 @@ namespace Ashe
         private static void RSelected()
         {
             var targetS = TargetSelector.SelectedTarget;
-            var useSL = ComboMenu["ComboSL"].Cast<KeyBind>().CurrentValue;
+            var useSL = ComboMenu["ComboSL"].Cast<CheckBox>().CurrentValue;
 
             if (targetS == null)
             {
@@ -422,7 +453,6 @@ namespace Ashe
             var target = TargetSelector.GetTarget(W.Range, DamageType.Physical);
             var champ = (AIHeroClient)e;
             var Keep2 = HarassMenu["KeepHarass"].Cast<CheckBox>().CurrentValue;
-            var useQ2 = HarassMenu["HarassQ"].Cast<CheckBox>().CurrentValue;
             var useQ = ComboMenu["ComboQ"].Cast<CheckBox>().CurrentValue;
             var Keep = ComboMenu["KeepCombo"].Cast<CheckBox>().CurrentValue;
             var useW = ComboMenu["ComboW"].Cast<CheckBox>().CurrentValue;
@@ -460,14 +490,21 @@ namespace Ashe
                         }
                     }
                 }
-
-                if (useQ && QReady && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && target.IsValidTarget(650))
+				
+                if (ComboMenu["Qmode"].Cast<ComboBox>().CurrentValue == 1)
                 {
-                    if (Keep)
+                    if (useQ && QReady && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && target.IsValidTarget(650))
                     {
-                        if (R.IsReady())
+                        if (Keep)
                         {
-                            if (Player.Instance.Mana > Q.Handle.SData.Mana + R.Handle.SData.Mana)
+                            if (R.IsReady())
+                            {
+                                if (Player.Instance.Mana > Q.Handle.SData.Mana + R.Handle.SData.Mana)
+                                {
+                                    Q.Cast();
+                                }
+                            }
+                            else
                             {
                                 Q.Cast();
                             }
@@ -476,32 +513,6 @@ namespace Ashe
                         {
                             Q.Cast();
                         }
-                    }
-                    else
-                    {
-                        Q.Cast();
-                    }
-                }
-
-                if (useQ2 && QReady && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) && target.IsValidTarget(650))
-                {
-                    if (Keep2)
-                    {
-                        if (R.IsReady())
-                        {
-                            if (Player.Instance.Mana > Q.Handle.SData.Mana + R.Handle.SData.Mana)
-                            {
-                                Q.Cast();
-                            }
-                        }
-                        else
-                        {
-                            Q.Cast();
-                        }
-                    }
-                    else
-                    {
-                        Q.Cast();
                     }
                 }
             }
@@ -517,7 +528,12 @@ namespace Ashe
             var mana = LaneClearMenu["manaFarm"].Cast<Slider>().CurrentValue;
             var minionQ = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(e => e.IsValidTarget(W.Range));
             var quang = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minionQ, W.Width, (int) W.Range);
-            if (_Player.ManaPercent < mana) return;
+
+            if (_Player.ManaPercent < mana)
+            {
+                return;
+            }
+
             foreach (var minion in minionQ)
             {
                 if (useW && W.IsReady() && minion.IsValidTarget(W.Range) && quang.HitNumber >= minW)
@@ -540,7 +556,12 @@ namespace Ashe
             var useQ = JungleClearMenu["jungleQ"].Cast<CheckBox>().CurrentValue;
             var useW = JungleClearMenu["jungleW"].Cast<CheckBox>().CurrentValue;
             var mana = JungleClearMenu["manaJung"].Cast<Slider>().CurrentValue;
-            if (_Player.ManaPercent < mana) return;
+
+            if (_Player.ManaPercent < mana)
+            {
+                return;
+            }
+
             if (monster != null)
             {
                 if (useQ && QReady && monster.IsValidTarget(Q.Range))
