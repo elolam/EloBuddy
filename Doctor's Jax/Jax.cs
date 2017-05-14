@@ -52,11 +52,12 @@ namespace Jax
             ComboMenu.Add("comboMode", new ComboBox("Combo Mode:", 0, "E => Q", "Q => E"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("ComboQ", new CheckBox("Combo [Q]"));
+            ComboMenu.Add("WaitE", new CheckBox("Only [Q] if [E] ready", false));
             ComboMenu.Add("ComboW", new CheckBox("Combo [W]"));
             ComboMenu.Add("ComboE", new CheckBox("Combo [E]"));
             ComboMenu.AddSeparator();
-            ComboMenu.Add("ComboR", new CheckBox("Combo [R]"));
-            ComboMenu.Add("MinR", new Slider("Min Enemies Use [R]", 2, 1, 5));
+            ComboMenu.Add("ComboR", new CheckBox("Use [R] x Enemies Around"));
+            ComboMenu.Add("MinR", new Slider("x enemies around use [R]", 2, 1, 5));
 
             Autos = Menu.AddSubMenu("Auto E/R Settings", "Autos");
             Autos.AddGroupLabel("Automatic Settings");
@@ -89,7 +90,7 @@ namespace Jax
             JungleClearMenu.Add("QJungle", new CheckBox("Spell [Q]"));
             JungleClearMenu.Add("WJungle", new CheckBox("Spell [W]"));
             JungleClearMenu.Add("EJungle", new CheckBox("Spell [E]"));
-            JungleClearMenu.Add("MnJungle", new Slider("Min Mana For JungleClear", 30));
+            JungleClearMenu.Add("MnJungle", new Slider("Min Mana For JungleClear", 10));
 
             Misc = Menu.AddSubMenu("Misc Settings", "Misc");
             Misc.AddGroupLabel("AntiGap Settings");
@@ -118,12 +119,12 @@ namespace Jax
         {
             if (Drawings["DrawQ"].Cast<CheckBox>().CurrentValue)
             {
-                new Circle() { Color = Color.White, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Orange, BorderWidth = 2, Radius = Q.Range }.Draw(_Player.Position);
             }
 
             if (Drawings["DrawE"].Cast<CheckBox>().CurrentValue)
             {
-                new Circle() { Color = Color.White, BorderWidth = 1, Radius = E.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Orange, BorderWidth = 2, Radius = E.Range }.Draw(_Player.Position);
             }
         }
 
@@ -205,6 +206,7 @@ namespace Jax
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             var useQ = ComboMenu["ComboQ"].Cast<CheckBox>().CurrentValue;
+            var wait = ComboMenu["WaitE"].Cast<CheckBox>().CurrentValue;
             var useE = ComboMenu["ComboE"].Cast<CheckBox>().CurrentValue;
             var useR = ComboMenu["ComboR"].Cast<CheckBox>().CurrentValue;
             var MinR = ComboMenu["MinR"].Cast<Slider>().CurrentValue;
@@ -232,15 +234,25 @@ namespace Jax
 
                     if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && (Player.Instance.GetAutoAttackRange() < target.Distance(Player.Instance) || Player.Instance.HealthPercent <= 25))
                     {
-                        if (ECasting)
+                        if (wait)
                         {
-                            Core.DelayAction(() => Q.Cast(target), 500);
+                            if (E.IsReady() || ECasting)
+                            {
+                                Core.DelayAction(() => Q.Cast(target), 500);
+                            }
                         }
                         else
                         {
-                            if (!E.IsReady())
+                            if (ECasting)
                             {
-                                Q.Cast(target);
+                                Core.DelayAction(() => Q.Cast(target), 500);
+                            }
+                            else
+                            {
+                                if (!E.IsReady())
+                                {
+                                    Q.Cast(target);
+                                }
                             }
                         }
                     }
@@ -253,9 +265,19 @@ namespace Jax
      	        {
                     if (useQ && Q.IsReady() && Player.Instance.GetAutoAttackRange() < target.Distance(Player.Instance))
                     {
-                        if (target.IsValidTarget(Q.Range))
+                        if (wait)
                         {
-                            Q.Cast(target);
+                            if (E.IsReady() || ECasting)
+                            {
+                                Q.Cast(target);
+                            }
+                        }
+                        else
+                        {
+                            if (target.IsValidTarget(Q.Range))
+                            {
+                                Q.Cast(target);
+                            }
                         }
                     }
 
@@ -496,7 +518,7 @@ namespace Jax
         public static void KillSteal()
         {
             var KsQ = KillStealMenu["KsQ"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in EntityManager.Heroes.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.HasBuff("JudicatorIntervention") && !hero.HasBuff("kindredrnodeathbuff") && !hero.IsDead && !hero.IsZombie))
+            foreach (var target in EntityManager.Heroes.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.HasBuff("JudicatorIntervention") && !hero.HasBuff("kindredrnodeathbuff") && !hero.HasBuff("Undying Rage") && !hero.IsDead && !hero.IsZombie))
             {
                 if (KsQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                 {
