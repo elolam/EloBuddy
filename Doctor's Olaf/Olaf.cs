@@ -19,7 +19,7 @@ namespace Olaf7
 {
     internal class Program
     {
-        public static Menu Menu, ComboMenu, HarassMenu, LaneClearMenu, LastHitMenu, JungleClearMenu, Misc, KillStealMenu, Skin, Drawings;
+        public static Menu Menu, ComboMenu, HarassMenu, LaneClearMenu, LastHitMenu, JungleClearMenu, Misc, KillStealMenu, Drawings;
         public static Item Botrk;
         public static Item Bil;
         public static Item Hydra;
@@ -132,11 +132,6 @@ namespace Olaf7
             KillStealMenu.Add("KsE", new CheckBox("Use [E] KillSteal"));
             KillStealMenu.Add("KsIgnite", new CheckBox("Use [Ignite] KillSteal"));
 
-            Skin = Menu.AddSubMenu("Skin Changer", "SkinChanger");
-            Skin.AddGroupLabel("Skin Settings");
-            Skin.Add("checkSkin", new CheckBox("Use Skin Changer"));
-            Skin.Add("skin.Id", new ComboBox("Skin Mode", 3, "Default", "1", "2", "3", "4", "5", "6"));
-
             Drawings = Menu.AddSubMenu("Misc Settings", "Draw");
             Drawings.AddGroupLabel("Misc Setting");
             Drawings.Add("QStun", new CheckBox("Use [Q] If Enemy Has CC", false));
@@ -208,24 +203,6 @@ namespace Olaf7
             KillSteal();
             RStun();
             Ult();
-
-            if (_Player.SkinId != Skin["skin.Id"].Cast<ComboBox>().CurrentValue)
-            {
-                if (checkSkin())
-                {
-                    Player.SetSkinId(SkinId());
-                }
-            }
-        }
-
-        public static int SkinId()
-        {
-            return Skin["skin.Id"].Cast<ComboBox>().CurrentValue;
-        }
-		
-        public static bool checkSkin()
-        {
-            return Skin["checkSkin"].Cast<CheckBox>().CurrentValue;
         }
 		
         public static void Combo()
