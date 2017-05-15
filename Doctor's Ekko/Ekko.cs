@@ -412,6 +412,7 @@ namespace Ekko
                         }
                     }
                 }
+            }
         }
 
         private static void EModes()
@@ -474,6 +475,7 @@ namespace Ekko
                     }
                 }
             }
+        }
 
 //LaneClear Mode
 
