@@ -137,6 +137,7 @@ namespace Ekko
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo();
+                EModes();
             }
 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
@@ -385,8 +386,6 @@ namespace Ekko
             var useQ = ComboMenu["CQ"].Cast<CheckBox>().CurrentValue;
             var useW = ComboMenu["CW"].Cast<CheckBox>().CurrentValue;
             var useW2 = ComboMenu["CW2"].Cast<CheckBox>().CurrentValue;
-            var useE = ComboMenu["CE"].Cast<CheckBox>().CurrentValue;
-            var turret = ComboMenu["CTurret"].Cast<KeyBind>().CurrentValue;
             foreach (var target in EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(W.Range) && !e.IsDead && !e.IsZombie))
             {
                 if (useQ && Q.CanCast(target))
@@ -413,8 +412,15 @@ namespace Ekko
                         }
                     }
                 }
+        }
 
-                if (useE && E.IsReady() && target.IsValidTarget(E.Range + 375) && (target.Distance(_Player.Position) >= 175 || Player.Instance.HealthPercent <= 20))
+        private static void EModes()
+        {
+            var useE = ComboMenu["CE"].Cast<CheckBox>().CurrentValue;
+            var turret = ComboMenu["CTurret"].Cast<KeyBind>().CurrentValue;
+            foreach (var target in EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(E.Range + 325) && !e.IsDead && !e.IsZombie))
+            {
+                if (useE && E.IsReady() && target.IsValidTarget(E.Range + 375) && (Player.Instance.Distance(target.Position) >= 175 || Player.Instance.HealthPercent <= 20))
                 {
                     if (ComboMenu["EMode"].Cast<ComboBox>().CurrentValue == 0)
                     {
@@ -468,7 +474,6 @@ namespace Ekko
                     }
                 }
             }
-        }
 
 //LaneClear Mode
 
