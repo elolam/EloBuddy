@@ -47,6 +47,7 @@ namespace Olaf7
         {
             if (!_Player.ChampionName.Contains("Olaf")) return;
             Chat.Print("Doctor's Olaf Loaded!", Color.Orange);
+            Chat.Print("Mercedes7", Color.Red);
             Q = new Spell.Skillshot(SpellSlot.Q, 1000, SkillShotType.Linear, 250, 1550, 75);
             Q.AllowedCollisionCount = int.MaxValue;
             W = new Spell.Active(SpellSlot.W);
@@ -216,10 +217,10 @@ namespace Olaf7
             var Minhpp = ComboMenu["ihpp"].Cast<Slider>().CurrentValue;
             if (target != null)
             {
-                var pos = Q.GetPrediction(target).CastPosition.Extend(Player.Instance.Position, -90);
+                var pos = Q.GetPrediction(target).CastPosition.Extend(Player.Instance.Position, -110);
                 if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                 {
-                    if (_Player.Distance(target) > 375)
+                    if (_Player.Distance(target) > 250)
                     {
                         Q.Cast(pos.To3DWorld());
                     }
@@ -389,10 +390,10 @@ namespace Olaf7
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             if (target != null)
             {
-                var pos = Q.GetPrediction(target).CastPosition.Extend(Player.Instance.Position, -90);
+                var pos = Q.GetPrediction(target).CastPosition.Extend(Player.Instance.Position, -110);
                 if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && Player.Instance.ManaPercent >= ManaQ)
                 {
-                    if (_Player.Distance(target) > 375)
+                    if (_Player.Distance(target) > 250)
                     {
                         Q.Cast(pos.To3DWorld());
                     }

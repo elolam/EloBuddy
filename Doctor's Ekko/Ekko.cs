@@ -42,7 +42,7 @@ namespace Ekko
         {
             if (!_Player.ChampionName.Contains("Ekko")) return;
             Chat.Print("Doctor's Ekko Loaded!", Color.White);
-            Chat.Print("Mercedes7!", Color.Red);
+            Chat.Print("Mercedes7", Color.Red);
             EkkoREmitter = ObjectManager.Get<Obj_GeneralParticleEmitter>().FirstOrDefault(x => x.Name.Equals("Ekko_Base_R_TrailEnd.troy"));
             Q = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Linear, 250, 2200, 60);
             Q.AllowedCollisionCount = int.MaxValue;
@@ -111,9 +111,6 @@ namespace Ekko
             Misc.Add("DrawW", new CheckBox("Draw [W]", false));
             Misc.Add("DrawR", new CheckBox("Draw [R]"));
             Misc.Add("DrawTR", new CheckBox("Status UnderTuret"));
-            Misc.AddGroupLabel("Skins Settings");
-            Misc.Add("checkSkin", new CheckBox("Use Skin Changer", false));
-            Misc.Add("skin.Id", new ComboBox("Skin Mode", 0, "Default", "1", "2", "3"));
 
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -155,14 +152,6 @@ namespace Ekko
             KillSteal();
             Ultimate();
             Miscs();
-
-            if (_Player.SkinId != Misc["skin.Id"].Cast<ComboBox>().CurrentValue)
-            {
-                if (checkSkin())
-                {
-                    Player.SetSkinId(SkinId());
-                }
-            }
 
             if (EkkoREmitter == null && R.IsReady())
             {
@@ -222,18 +211,6 @@ namespace Ekko
                 var castPos = Player.Instance.Position.Distance(cursorPos) <= E.Range ? cursorPos : Player.Instance.Position.Extend(cursorPos, E.Range).To3D();
                 Player.CastSpell(SpellSlot.E, Game.CursorPos);
             }
-        }
-
-// Skin Changer
-
-        public static int SkinId()
-        {
-            return Misc["skin.Id"].Cast<ComboBox>().CurrentValue;
-        }
-
-        public static bool checkSkin()
-        {
-            return Misc["checkSkin"].Cast<CheckBox>().CurrentValue;
         }
 
 //Damage
@@ -373,22 +350,12 @@ namespace Ekko
                     {
                         if (!UnderTuret(target))
                         {
-                            if (Player.CastSpell(SpellSlot.E, target.Position));
-                            {
-                                Orbwalker.ResetAutoAttack();
-                                Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                                return;
-                            }
+                            Player.CastSpell(SpellSlot.E, target.Position);
                         }
                     }
                     else
                     {
-                        if (Player.CastSpell(SpellSlot.E, target.Position));
-                        {
-                            Orbwalker.ResetAutoAttack();
-                            Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                            return;
-                        }
+                        Player.CastSpell(SpellSlot.E, target.Position);
                     }
                 }
             }
@@ -446,23 +413,12 @@ namespace Ekko
                         {
                             if (!UnderTuret(target))
                             {
-                                if (Player.CastSpell(SpellSlot.E, target.Position));
-                                {
-                                    Orbwalker.ResetAutoAttack();
-                                    Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                                    return;
-                                }
-								
+                                Player.CastSpell(SpellSlot.E, target.Position);	
                             }
                         }
                         else
                         {
-                                if (Player.CastSpell(SpellSlot.E, target.Position));
-                                {
-                                    Orbwalker.ResetAutoAttack();
-                                    Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                                    return;
-                                }
+                            Player.CastSpell(SpellSlot.E, target.Position);
                         }
                         
                         if (ComboMenu["EMode"].Cast<ComboBox>().CurrentValue == 1)
@@ -471,23 +427,13 @@ namespace Ekko
                             {
                                 if (!UnderTuret(target))
                                 {
-                                    if (Player.CastSpell(SpellSlot.E, Game.CursorPos));
-                                    {
-                                        Orbwalker.ResetAutoAttack();
-                                        Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                                        return;
-                                    }
+                                    Player.CastSpell(SpellSlot.E, Game.CursorPos);
                                 }
                             }
                         }
                         else
                         {
-                            if (Player.CastSpell(SpellSlot.E, Game.CursorPos));
-                            {
-                                Orbwalker.ResetAutoAttack();
-                                Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                                return;
-                            }
+                            Player.CastSpell(SpellSlot.E, Game.CursorPos);
                         }
                     }
                 }
