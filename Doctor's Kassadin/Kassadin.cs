@@ -373,7 +373,7 @@ namespace Kassadin7
             var key = Auto["Key"].Cast<KeyBind>().CurrentValue;
             foreach (var Selector in EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(Q.Range) && !e.IsDead))
             {
-                if (key && Selector.IsValidTarget(Q.Range) && !Orbwalker.IsAutoAttacking && !UnderTuret(Player.Instance.Position) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                if (key && Selector.IsValidTarget(Q.Range) && !Orbwalker.IsAutoAttacking && !UnderTuret(_Player) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
                 {
                     if (useQ && Q.IsReady() && mana <= Player.Instance.ManaPercent)
                     {
