@@ -102,8 +102,8 @@ namespace Ashe
 
             Misc = Menu.AddSubMenu("Misc Settings", "Draw");
             Misc.AddGroupLabel("Anti Gapcloser");
-            Misc.Add("antiGap", new CheckBox("Anti Gapcloser", false));
-            Misc.Add("antiRengar", new CheckBox("Anti Rengar KhaZix", false));
+            Misc.Add("antiGap", new CheckBox("Use [R] Anti Gapcloser", false));
+            Misc.Add("antiRengar", new CheckBox("Use [R] Anti Rengar KhaZix", false));
             Misc.Add("inter", new CheckBox("Use [R] Interupt"));
             Misc.AddGroupLabel("Drawings Settings");
             Misc.Add("Draw_Disabled", new CheckBox("Disabled Drawings", false));
