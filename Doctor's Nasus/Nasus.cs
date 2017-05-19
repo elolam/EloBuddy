@@ -38,7 +38,7 @@ namespace Nasus
             Chat.Print("Mercedes7", Color.Red);
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Targeted(SpellSlot.W, 550);
-            E = new Spell.Skillshot(SpellSlot.E, 600, SkillShotType.Circular, 500, 20, 380)
+            E = new Spell.Skillshot(SpellSlot.E, 600, SkillShotType.Circular, 500, 20, 380);
             R = new Spell.Active(SpellSlot.R);
             Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             Menu = MainMenu.AddMenu("Doctor's Nasus", "Nasus");
