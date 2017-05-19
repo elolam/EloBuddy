@@ -146,11 +146,6 @@ namespace Ashe
             {
                 LaneClear();
             }
-
-            if (ComboMenu["ComboSL"].Cast<KeyBind>().CurrentValue)
-            {
-                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-            }
 			
             KillSteal();
             Item();
