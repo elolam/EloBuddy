@@ -19,7 +19,7 @@ namespace Kassadin7
 {
     internal class Program
     {
-        public static Menu Menu, ComboMenu, HarassMenu, LaneClearMenu, LastHitMenu, JungleClearMenu, KillStealMenu, Misc;
+        public static Menu Menu, ComboMenu, HarassMenu, Auto, LaneClearMenu, LastHitMenu, JungleClearMenu, KillStealMenu, Misc;
         public static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
@@ -51,8 +51,8 @@ namespace Kassadin7
             Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             thm = new Font(Drawing.Direct3DDevice, new FontDescription { FaceName = "Tahoma", Height = 15, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.ClearType });
             Seraph = new Item(3040);
-            Menu = MainMenu.AddMenu("Kassadin", "Kassadin");
-            Menu.AddGroupLabel(" Doctor7 ");
+            Menu = MainMenu.AddMenu("Doctor's Kassadin", "Kassadin");
+            Menu.AddGroupLabel("Mercedes7 ");
             ComboMenu = Menu.AddSubMenu("Combo Settings", "Combo");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.Add("ComboQ", new CheckBox("Use [Q] Combo"));
@@ -80,11 +80,23 @@ namespace Kassadin7
             LaneClearMenu.AddGroupLabel("Lane Clear Settings");
             LaneClearMenu.Add("QLC", new CheckBox("Use [Q] LaneClear", false));
             LaneClearMenu.Add("WLC", new CheckBox("Use [W] LaneClear"));
+            LaneClearMenu.Add("WMode", new ComboBox("W LaneClear Mode:", 0, "Only Killable", "Always"));
             LaneClearMenu.Add("ELC", new CheckBox("Use [E] LaneClear", false));
             LaneClearMenu.Add("MinELC", new Slider("Min Hit Minions Use [E]", 2, 1, 3));
             LaneClearMenu.Add("RLC", new CheckBox("Use [R] LaneClear", false));
             LaneClearMenu.Add("StackRL", new Slider("Use [R] Stacks Limit LaneClear", 1, 1, 5));
             LaneClearMenu.Add("ManaLC", new Slider("Mana For LaneClear", 50));
+			
+            Auto = Menu.AddSubMenu("Auto Harass Settings", "Auto Harass");
+			Auto.AddGroupLabel("Auto Harass Settings");
+            Auto.Add("Key", new KeyBind("Auto Harass", false, KeyBind.BindTypes.PressToggle, 'A'));
+            Auto.Add("QLCH", new CheckBox("Use [Q]"));
+            Auto.Add("ManaQHS", new Slider("Min Mana Auto Harass [Q]", 60));
+            Auto.AddGroupLabel("Auto Harass On");
+            foreach (var target in EntityManager.Heroes.Enemies)
+            {
+                Auto.Add("harass" + target.ChampionName, new CheckBox("" + target.ChampionName));
+            }
 
             LastHitMenu = Menu.AddSubMenu("LastHit Settings", "LastHit");
             LastHitMenu.AddGroupLabel("LastHit Settings");
@@ -117,6 +129,7 @@ namespace Kassadin7
             Misc.Add("DrawQ", new CheckBox("Q Range"));
             Misc.Add("DrawE", new CheckBox("E Range", false));
             Misc.Add("DrawTR", new CheckBox("DrawText Status [R]"));
+            Misc.Add("DrawAT", new CheckBox("Draw Auto Harass"));
             Misc.AddGroupLabel("Interrupt Settings");
             Misc.Add("inter", new CheckBox("Use [Q] Interupt"));
             Misc.Add("AntiGap", new CheckBox("Use [E] Anti Gapcloser"));
@@ -160,6 +173,15 @@ namespace Kassadin7
                     DrawFont(thm, "Use R Under Turret : Enable", (float)(ft[0] - 70), (float)(ft[1] + 50), SharpDX.Color.Red);
                 }
             }
+			
+            if (Misc["DrawAT"].Cast<CheckBox>().CurrentValue)
+            {
+                Vector2 ft = Drawing.WorldToScreen(_Player.Position);
+                if (LaneClearMenu["Key"].Cast<KeyBind>().CurrentValue)
+                {
+                    DrawFont(Thn, "Auto Harass : Enable", (float)(ft[0] - 60), (float)(ft[1] + 20), SharpDX.Color.Yellow);
+                }
+            }
         }
 
         private static void Game_OnUpdate(EventArgs args)
@@ -196,6 +218,7 @@ namespace Kassadin7
 			
             KillSteal();
             Dtc();
+            AutoHarass();
 			
             if (_Player.SkinId != Misc["skin.Id"].Cast<ComboBox>().CurrentValue)
             {
@@ -301,17 +324,26 @@ namespace Kassadin7
             var MinE = LaneClearMenu["MinELC"].Cast<Slider>().CurrentValue;
             var minRs = LaneClearMenu["StackRL"].Cast<Slider>().CurrentValue;
             var mana = LaneClearMenu["ManaLC"].Cast<Slider>().CurrentValue;
-            var minionQ = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(e => e.IsValidTarget(E.Range));
             var quang = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minionQ, E.Width, (int) E.Range);
-            foreach (var minions in minionQ)
+            foreach (var minions in EntityManager.MinionsAndMonsters.GetLaneMinions().Where(e => e.IsValidTarget(E.Range)))
             {
                 if (useW && W.IsReady() && minions.IsValidTarget(275) && minions.IsInAutoAttackRange(Player.Instance)
-                && Player.Instance.Distance(minions.ServerPosition) <= 225f
-                && Player.Instance.GetSpellDamage(minions, SpellSlot.W) + Player.Instance.GetAutoAttackDamage(minions)
-                >= minions.TotalShieldHealth())
+                && Player.Instance.Distance(minions.ServerPosition) <= 225f)
                 {
-                    W.Cast();
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, minions);
+                    if (LaneClearMenu["WMode"].Cast<ComboBox>().CurrentValue == 0)
+                    {
+                        if (Player.Instance.GetSpellDamage(minions, SpellSlot.W) + Player.Instance.GetAutoAttackDamage(minions) >= minions.TotalShieldHealth())
+                        {
+                            W.Cast();
+                            Player.IssueOrder(GameObjectOrder.AttackUnit, minions);
+                        }
+                    }
+
+                    if (LaneClearMenu["WMode"].Cast<ComboBox>().CurrentValue == 1)
+                    {
+                        W.Cast();
+                        Player.IssueOrder(GameObjectOrder.AttackUnit, minions);
+                    }
                 }
 
 				
@@ -329,6 +361,26 @@ namespace Kassadin7
                 if (useR && R.IsReady() && minions.IsValidTarget(R.Range) && !UnderTuret(minions) && Player.Instance.GetBuffCount("RiftWalk") < minRs)
                 {
                     R.Cast(minions);
+                }
+            }
+        }
+		
+        private static void AutoHarass()
+        {
+            var useQ = Auto["QLCH"].Cast<CheckBox>().CurrentValue;
+            var mana = Auto["ManaQHS"].Cast<Slider>().CurrentValue;
+            var key = Auto["Key"].Cast<KeyBind>().CurrentValue;
+            foreach (var Selector in EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(Q.Range) && !e.IsDead))
+            {
+                if (key && Selector.IsValidTarget(Q.Range) && !Orbwalker.IsAutoAttacking && !UnderTuret(_Player.Position) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    if (useQ && Q.IsReady() && mana <= Player.Instance.ManaPercent)
+                    {
+                        if (Auto["harass" + Selector.ChampionName].Cast<CheckBox>().CurrentValue)
+                        {
+                            Q.Cast(Selector);
+                        }
+                    }
                 }
             }
         }
