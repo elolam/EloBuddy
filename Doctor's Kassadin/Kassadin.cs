@@ -84,6 +84,7 @@ namespace Kassadin7
             LaneClearMenu.Add("ELC", new CheckBox("Use [E] LaneClear", false));
             LaneClearMenu.Add("MinELC", new Slider("Min Hit Minions Use [E]", 2, 1, 3));
             LaneClearMenu.Add("RLC", new CheckBox("Use [R] LaneClear", false));
+            LaneClearMenu.Add("MinRLC", new Slider("Min Hit Minions Use [R]", 2, 1, 3));
             LaneClearMenu.Add("StackRL", new Slider("Use [R] Stacks Limit LaneClear", 1, 1, 5));
             LaneClearMenu.Add("ManaLC", new Slider("Mana For LaneClear", 50));
 			
@@ -322,11 +323,10 @@ namespace Kassadin7
             var useE = LaneClearMenu["ELC"].Cast<CheckBox>().CurrentValue;
             var useR = LaneClearMenu["RLC"].Cast<CheckBox>().CurrentValue;
             var MinE = LaneClearMenu["MinELC"].Cast<Slider>().CurrentValue;
+            var MinR = LaneClearMenu["MinRLC"].Cast<Slider>().CurrentValue;
             var minRs = LaneClearMenu["StackRL"].Cast<Slider>().CurrentValue;
             var mana = LaneClearMenu["ManaLC"].Cast<Slider>().CurrentValue;
-            var minionQ = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(e => e.IsValidTarget(E.Range));
-            var quang = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minionQ, E.Width, (int) E.Range);
-            foreach (var minions in minionQ)
+            foreach (var minions in EntityManager.MinionsAndMonsters.GetLaneMinions().Where(e => e.IsValidTarget(R.Range)))
             {
                 if (useW && W.IsReady() && minions.IsValidTarget(275) && minions.IsInAutoAttackRange(Player.Instance)
                 && Player.Instance.Distance(minions.ServerPosition) <= 225f)
@@ -354,12 +354,12 @@ namespace Kassadin7
                     Q.Cast(minions);
                 }
 				
-                if (useE && E.IsReady() && EReady && minions.IsValidTarget(E.Range) && quang.HitNumber >= MinE)
+                if (useE && E.IsReady() && EReady && minions.IsValidTarget(E.Range) && minions.CountEnemyMinionsInRange(450) >= MinE)
                 {
-                    E.Cast(quang.CastPosition);
+                    E.Cast(minions);
                 }
 				
-                if (useR && R.IsReady() && minions.IsValidTarget(R.Range) && !UnderTuret(minions) && Player.Instance.GetBuffCount("RiftWalk") < minRs)
+                if (useR && R.IsReady() && minions.IsValidTarget(R.Range) && !UnderTuret(minions) && Player.Instance.GetBuffCount("RiftWalk") < minRs && minions.CountEnemyMinionsInRange(450) >= MinR)
                 {
                     R.Cast(minions);
                 }
@@ -373,7 +373,7 @@ namespace Kassadin7
             var key = Auto["Key"].Cast<KeyBind>().CurrentValue;
             foreach (var Selector in EntityManager.Heroes.Enemies.Where(e => e.IsValidTarget(Q.Range) && !e.IsDead))
             {
-                if (key && Selector.IsValidTarget(Q.Range) && !Orbwalker.IsAutoAttacking && !UnderTuret(_Player.Position) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                if (key && Selector.IsValidTarget(Q.Range) && !Orbwalker.IsAutoAttacking && !UnderTuret(Player.Instance.Position) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
                 {
                     if (useQ && Q.IsReady() && mana <= Player.Instance.ManaPercent)
                     {
