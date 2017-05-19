@@ -168,7 +168,7 @@ namespace Nasus
                     Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                 }
 
-                if (useW && W.IsReady() && target.IsValidTarget(W.Range))
+                if (useW && W.IsReady() && target.IsValidTarget(W.Range) && _Player.Position.Distance(target) > 175)
                 {
                     W.Cast(target);
                 }
@@ -260,7 +260,7 @@ namespace Nasus
                     Player.IssueOrder(GameObjectOrder.AttackUnit, target);
                 }
 
-                if (useW && W.IsReady() && target.IsValidTarget(W.Range))
+                if (useW && W.IsReady() && target.IsValidTarget(W.Range) && _Player.Position.Distance(target) > 175)
                 {
                     W.Cast(target);
                 }
