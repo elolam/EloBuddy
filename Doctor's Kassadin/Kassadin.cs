@@ -179,7 +179,7 @@ namespace Kassadin7
                 Vector2 ft = Drawing.WorldToScreen(_Player.Position);
                 if (LaneClearMenu["Key"].Cast<KeyBind>().CurrentValue)
                 {
-                    DrawFont(Thn, "Auto Harass : Enable", (float)(ft[0] - 60), (float)(ft[1] + 20), SharpDX.Color.Yellow);
+                    DrawFont(thm, "Auto Harass : Enable", (float)(ft[0] - 60), (float)(ft[1] + 20), SharpDX.Color.Yellow);
                 }
             }
         }
@@ -324,8 +324,9 @@ namespace Kassadin7
             var MinE = LaneClearMenu["MinELC"].Cast<Slider>().CurrentValue;
             var minRs = LaneClearMenu["StackRL"].Cast<Slider>().CurrentValue;
             var mana = LaneClearMenu["ManaLC"].Cast<Slider>().CurrentValue;
+            var minionQ = EntityManager.MinionsAndMonsters.GetLaneMinions().Where(e => e.IsValidTarget(E.Range));
             var quang = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minionQ, E.Width, (int) E.Range);
-            foreach (var minions in EntityManager.MinionsAndMonsters.GetLaneMinions().Where(e => e.IsValidTarget(E.Range)))
+            foreach (var minions in minionQ)
             {
                 if (useW && W.IsReady() && minions.IsValidTarget(275) && minions.IsInAutoAttackRange(Player.Instance)
                 && Player.Instance.Distance(minions.ServerPosition) <= 225f)
