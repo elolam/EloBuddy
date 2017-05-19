@@ -38,7 +38,6 @@ namespace Talon7
         {
             if (!_Player.ChampionName.Contains("Talon")) return;
             Chat.Print("Doctor's Talon Loaded!", Color.Orange);
-            Bootstrap.Init(null);
             Q = new Spell.Targeted(SpellSlot.Q, 500);
             W = new Spell.Skillshot(SpellSlot.W, 750, SkillShotType.Cone, 1, 2300, 80);
             W.AllowedCollisionCount = int.MaxValue;
