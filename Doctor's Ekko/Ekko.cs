@@ -59,7 +59,6 @@ namespace Ekko
             ComboMenu.Add("CW", new CheckBox("Use [W] Combo"));
             ComboMenu.Add("CW2", new CheckBox("Use [W] No Prediction", false));
             ComboMenu.Add("CE", new CheckBox("Use [E] Combo"));
-            ComboMenu.Add("EMode", new ComboBox("Combo Mode:", 0, "E To Target", "E To Mouse"));
             ComboMenu.Add("CTurret", new KeyBind("Don't Use [E] UnderTurret", false, KeyBind.BindTypes.PressToggle, 'T'));
 
             Ulti = Menu.AddSubMenu("Ulti Settings", "Ulti");
@@ -423,54 +422,25 @@ namespace Ekko
             {
                 if (useE && E.IsReady() && target.IsValidTarget(E.Range + 375) && (Player.Instance.Distance(target.Position) >= 175 || Player.Instance.HealthPercent <= 20))
                 {
-                    if (ComboMenu["EMode"].Cast<ComboBox>().CurrentValue == 0)
+                    if (turret)
                     {
-                        if (turret)
+                        if (!UnderTuret(target))
                         {
-                            if (!UnderTuret(target))
-                            {
-                                if (Player.CastSpell(SpellSlot.E, target.Position));
-                                {
-                                    Orbwalker.ResetAutoAttack();
-                                    Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                                    return;
-                                }
-								
-                            }
-                        }
-                        else
-                        {
-                                if (Player.CastSpell(SpellSlot.E, target.Position));
-                                {
-                                    Orbwalker.ResetAutoAttack();
-                                    Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                                    return;
-                                }
-                        }
-                        
-                        if (ComboMenu["EMode"].Cast<ComboBox>().CurrentValue == 1)
-                        {
-                            if (turret)
-                            {
-                                if (!UnderTuret(target))
-                                {
-                                    if (Player.CastSpell(SpellSlot.E, Game.CursorPos));
-                                    {
-                                        Orbwalker.ResetAutoAttack();
-                                        Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (Player.CastSpell(SpellSlot.E, Game.CursorPos));
+                            if (Player.CastSpell(SpellSlot.E, target.Position));
                             {
                                 Orbwalker.ResetAutoAttack();
                                 Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
                                 return;
-                            }
+                            }				
+                        }
+                    }
+                    else
+                    {
+                        if (Player.CastSpell(SpellSlot.E, target.Position));
+                        {
+                            Orbwalker.ResetAutoAttack();
+                            Core.DelayAction(() => EloBuddy.Player.IssueOrder(GameObjectOrder.AttackUnit, target),  500);
+                            return;
                         }
                     }
                 }
