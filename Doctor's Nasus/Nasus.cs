@@ -188,14 +188,9 @@ namespace Nasus
         {
             var useR = ComboMenu["ComboR"].Cast<CheckBox>().CurrentValue;
             var hp = ComboMenu["Rhp"].Cast<Slider>().CurrentValue;
-            if (useR && R.IsReady() && !Player.Instance.IsInShopRange() && _Player.Position.CountEnemyChampionsInRange >= 1)
+            if (useR && R.IsReady() && !Player.Instance.IsInShopRange() && _Player.Position.CountEnemyChampionsInRange(600) >= 1)
             {
                 if (Player.Instance.HealthPercent <= hp)
-                {
-                    R.Cast();
-                }
-
-                if (target.GetAutoAttackDamage(_Player) >= _Player.Health)
                 {
                     R.Cast();
                 }
