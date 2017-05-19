@@ -37,8 +37,8 @@ namespace Nasus
             Chat.Print("Doctor's Nasus Loaded!", Color.Orange);
             Chat.Print("Mercedes7", Color.Red);
             Q = new Spell.Active(SpellSlot.Q);
-            W = new Spell.Targeted(SpellSlot.W, 550);
-            E = new Spell.Skillshot(SpellSlot.E, 600, SkillShotType.Circular, 500, 20, 380);
+            W = new Spell.Targeted(SpellSlot.W, 600);
+            E = new Spell.Skillshot(SpellSlot.E, 650, SkillShotType.Circular, 500, 20, 380);
             R = new Spell.Active(SpellSlot.R);
             Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             Menu = MainMenu.AddMenu("Doctor's Nasus", "Nasus");
@@ -63,16 +63,16 @@ namespace Nasus
             LaneClearMenu.Add("QLC", new CheckBox("Use [Q] LaneClear"));
             LaneClearMenu.Add("ELC", new CheckBox("Use [E] LaneClear", false));
             LaneClearMenu.Add("mine", new Slider("Min hit minions use [E]", 3, 1, 6));
-            LaneClearMenu.Add("MLC", new Slider("Min Mana LaneClear", 20));
+            LaneClearMenu.Add("MLC", new Slider("Min Mana LaneClear", 10));
             LaneClearMenu.AddGroupLabel("LastHit Settings");
             LaneClearMenu.Add("QLH", new CheckBox("Use [Q] LastHit"));
-            LaneClearMenu.Add("MLH", new Slider("Min Mana LastHit", 20));
+            LaneClearMenu.Add("MLH", new Slider("Min Mana LastHit", 10));
 
             JungleClearMenu = Menu.AddSubMenu("JungleClear Settings", "JungleClear");
             JungleClearMenu.AddGroupLabel("JungleClear Settings");
             JungleClearMenu.Add("QJungle", new CheckBox("Use [Q] JungleClear"));
             JungleClearMenu.Add("EJungle", new CheckBox("Use [E] JungleClear"));
-            JungleClearMenu.Add("MJC", new Slider("Min Mana JungleClear", 30));
+            JungleClearMenu.Add("MJC", new Slider("Min Mana JungleClear", 10));
 
             KillStealMenu = Menu.AddSubMenu("KillSteal Settings", "KillSteal");
             KillStealMenu.AddGroupLabel("KillSteal Settings");
@@ -175,11 +175,7 @@ namespace Nasus
 
                 if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                 {
-                    var Pred = (E.GetPrediction(target));
-                    if (Pred.HitChancePercent >= 60)
-                    {
-                        E.Cast(Pred.CastPosition);
-                    }
+                    E.Cast(target.Position);
                 }
             }
         }
@@ -271,11 +267,7 @@ namespace Nasus
 
                 if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                 {
-                    var Pred = (E.GetPrediction(target));
-                    if (Pred.HitChancePercent >= 60)
-                    {
-                        E.Cast(Pred.CastPosition);
-                    }
+                    E.Cast(target.Position);
                 }
             }
         }
