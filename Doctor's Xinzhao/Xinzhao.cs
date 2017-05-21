@@ -49,7 +49,7 @@ namespace XinZhao7
         {
             if (!_Player.ChampionName.Contains("XinZhao")) return;
             Chat.Print("Doctor's Xinzhao Loaded!", Color.Orange);
-            Bootstrap.Init(null);
+            Chat.Print("Mercedes7", Color.Red);
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Targeted(SpellSlot.E, 600);
@@ -122,7 +122,7 @@ namespace XinZhao7
             Misc.Add("inter", new CheckBox("Use [R] Interupt"));
 
             Drawing.OnDraw += Drawing_OnDraw;
-            Game.OnTick += Game_OnTick;
+            Game.OnUpdate += Game_OnUpdate;
             Orbwalker.OnPostAttack += ResetAttack;
             Interrupter.OnInterruptableSpell += Interupt;
             Drawing.OnEndScene += Damage;
@@ -152,47 +152,36 @@ namespace XinZhao7
             }
         }
 
-        private static void Game_OnTick(EventArgs args)
+        private static void Game_OnUpdate(EventArgs args)
         {
 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
                 LaneClear();
             }
+			
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
             {
                 Harass();
             }
+			
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
                 JungleClear();
             }
+			
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
             }
+			
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
 				Combo();
             }
-                KillSteal();
-                Ultimate();
-            if (_Player.SkinId != Misc["skin.Id"].Cast<ComboBox>().CurrentValue)
-            {
-                if (checkSkin())
-                {
-                    Player.SetSkinId(SkinId());
-                }
-            }
-        }
-
-        public static int SkinId()
-        {
-            return Misc["skin.Id"].Cast<ComboBox>().CurrentValue;
-        }
-        public static bool checkSkin()
-        {
-            return Misc["checkSkin"].Cast<CheckBox>().CurrentValue;
+			
+            KillSteal();
+            Ultimate();
         }
 
         private static void Damage(EventArgs args)
