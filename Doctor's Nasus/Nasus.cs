@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
@@ -7,7 +10,9 @@ using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
+using Font = SharpDX.Direct3D9.Font;
 using SharpDX;
+using SharpDX.Direct3D9;
 using Color = System.Drawing.Color;
 
 namespace Nasus
@@ -25,6 +30,10 @@ namespace Nasus
         public static Spell.Skillshot E;
         public static Spell.Active R;
         public static Spell.Targeted Ignite;
+        public const float YOff = 10;
+        public const float XOff = 0;
+        public const float Width = 107;
+        public const float Thick = 9;
 
         static void Main(string[] args)
         {
@@ -84,10 +93,12 @@ namespace Nasus
             Misc.AddGroupLabel("Drawing Settings");
             Misc.Add("DrawW", new CheckBox("[W] Range", false));
             Misc.Add("DrawE", new CheckBox("[E] Range", false));
+            Misc.Add("Damage", new CheckBox("[Q] Damage Indicator [R]"));
             Misc.Add("Draw_Disabled", new CheckBox("Disabled Drawings"));
 
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += Game_OnUpdate;
+            Drawing.OnEndScene += Damage;
         }
 
         private static void Drawing_OnDraw(EventArgs args)
@@ -152,6 +163,23 @@ namespace Nasus
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 0, 55, 95, 135, 175, 215 }[E.Level] + 0.6f * _Player.FlatMagicDamageMod));
+        }
+		
+        private static void Damage(EventArgs args)
+        {
+            foreach (var enemy in EntityManager.Heroes.Enemies.Where(e => e.IsValid && e.IsHPBarRendered && e.TotalShieldHealth() > 10))
+            {
+                var damage = QDamage(enemy);
+
+                if (Misc["Damage"].Cast<CheckBox>().CurrentValue && !Misc["Draw_Disabled"].Cast<CheckBox>().CurrentValue)
+                {
+                    var dmgPer = (enemy.TotalShieldHealth() - damage > 0 ? enemy.TotalShieldHealth() - damage : 0) / enemy.TotalShieldMaxHealth();
+                    var currentHPPer = enemy.TotalShieldHealth() / enemy.TotalShieldMaxHealth();
+                    var initPoint = new Vector2((int)(enemy.HPBarPosition.X + XOff + dmgPer * Width), (int)enemy.HPBarPosition.Y + YOff);
+                    var endPoint = new Vector2((int)(enemy.HPBarPosition.X + XOff + currentHPPer * Width) + 1, (int)enemy.HPBarPosition.Y + YOff);
+                    EloBuddy.SDK.Rendering.Line.DrawLine(System.Drawing.Color.Orange, Thick, initPoint, endPoint);
+                }
+            }
         }
 
         private static void Combo()
