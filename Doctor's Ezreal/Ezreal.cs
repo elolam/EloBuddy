@@ -233,6 +233,12 @@ namespace Ezreal
             RStun();
             Item();
         }
+		
+        public static float QDamage(Obj_AI_Base target)
+        {
+            return _Player.CalculateDamageOnUnit(target, DamageType.Physical,
+                (float)(new[] { 0, 35, 55, 75, 95, 115 }[Q.Level] + 1.1f * _Player.FlatPhysicalDamageMod) + 0.4f * _Player.FlatMagicDamageMod);
+        }		
 
         public static void Item()
         {
@@ -387,9 +393,9 @@ namespace Ezreal
             {
                 if (LaneClearMenu["LCMode"].Cast<ComboBox>().CurrentValue == 0)
                 {
-                    if (useQ && Player.Instance.ManaPercent >= mana)
+                    if (useQ && !Orbwalker.IsAutoAttacking && Player.Instance.ManaPercent >= mana)
                     {
-                        if (Q.IsReady() && Prediction.Health.GetPrediction(minions, Q.CastDelay) <= Player.Instance.GetSpellDamage(minions, SpellSlot.Q) && !Orbwalker.IsAutoAttacking)
+                        if (Q.IsReady() && Prediction.Health.GetPrediction(minions, Q.CastDelay) <= QDamage(minions) + Player.Instance.GetAutoAttackDamage(minions))
                         {
                             Q.Cast(minions);
                         }
