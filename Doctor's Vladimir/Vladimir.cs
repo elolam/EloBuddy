@@ -210,12 +210,13 @@ namespace Vladimir
         public static float QDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 0, 80, 100, 120, 140, 160 }[Program.Q.Level] + 0.45f * _Player.FlatMagicDamageMod));
+                (float)(new[] { 0, 80, 100, 120, 140, 160 }[Q.Level] + 0.45f * _Player.FlatMagicDamageMod));
         }
 
         public static float EDamage(Obj_AI_Base target)
         {
-            return Player.Instance.GetSpellDamage(target, SpellSlot.E);
+            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
+                (float)(new[] { 0, 30, 40, 50, 60, 70 }[E.Level] + 0.35f * _Player.FlatMagicDamageMod) + 0.25f * _Player.Health);
         }
 
         public static float RDamage(Obj_AI_Base target)
@@ -558,7 +559,12 @@ namespace Vladimir
 				
                 if (KsE && E.IsReady() && E.IsInRange(target))
                 {
-                    if (target.Health + target.AttackShield <= EDamage(target) && !EActive)
+                    if (target.Health + target.AttackShield <= EDamage(target) * 2 && !EActive)
+                    {
+                        E.Cast();
+                    }
+
+                    if (target.Health + target.AttackShield <= EDamage(target) && EActive)
                     {
                         E.Cast();
                     }
